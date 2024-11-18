@@ -11,18 +11,15 @@ const PORT = process.env.PORT || 3003;
 app.get('/', async (req, res) => {
   try {
     const response = await axios.get('https://dog.ceo/api/breeds/image/random');
-    console.log(response.data);
-    console.log("got the request at server 3");
     res.json({
       success: true,
       message: 'Random dog image fetched successfully!',
-      responseFrom: 'Response from port 3003',
-      data: response.data, // Include the original data from the API
+      responseFrom: `Response from port ${PORT}`,
+      imageUrl: response.data.message 
     });
   } catch (error) {
     res.status(500).send('Error fetching dog image');
     console.log(error)
-
   }
 });
 
