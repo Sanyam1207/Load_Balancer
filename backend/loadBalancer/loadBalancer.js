@@ -11,6 +11,7 @@ const dbconnect = require("../db/dbConfig")
 const auth = require("../router/authRouter")
 
 const app = express();
+app.use(cors());
 
 const servers = [
     { host: 'http://localhost', port: 3001 },
@@ -29,31 +30,27 @@ let current = 0;
 app.get('/dog', async (req, res) => {
     const count = parseInt(req.query.count, 10) || 1; // Default to 1 if not specified
     console.log(count);
-    
     const imagePromises = [];
 
     try {
-        // Distribute requests across servers using round-robin logic
         for (let i = 0; i < count; i++) {
             const target = servers[current];
-            current = (current + 1) % servers.length; // Rotate to the next server
+            current = (current + 1) % servers.length;
             const url = `${target.host}:${target.port}/`;
-
-            // Push the request to the promise array
-            const response = await axios.get(url)
-            imagePromises.push(response);
+            imagePromises.push(axios.get(url));
         }
 
-        // Wait for all requests to complete
         const responses = await Promise.all(imagePromises);
-        const images = responses.map((response) => response.data);
+        const images = responses.map(response => ({
+            url: response.data.imageUrl, // yaha se image 
+            port: response.data.responseFrom // yaha se port ka data
+        }));
 
-        // Return the collected images and metadata
         res.json({
             success: true,
             message: `${count} dog images fetched successfully!`,
             responseFrom: 'Load Balancer',
-            data: images,
+            images: images 
         });
     } catch (error) {
         console.error('Error forwarding requests:', error.message);
