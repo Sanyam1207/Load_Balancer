@@ -6,7 +6,7 @@ const App = () => {
 
   const fetchDogImage = async () => {
     try {
-      const response = await axios.get('http://localhost:8080');
+      const response = await axios.get('http://localhost:8004');
       setDogImage(response.data.imageUrl);
     } catch (error) {
       console.error('Error fetching dog image:', error);
