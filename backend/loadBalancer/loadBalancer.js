@@ -1,6 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const cookieParser = require('cookie-parser')
+const bcrypt = require('bcrypt')
+const mongoose = require('mongoose')
+const path = require('path')
+const bodyParser = require("body-parser")
+const jwt = require("jsonwebtoken")
+const dbconnect = require("../db/dbConfig")
+const auth = require("../router/authRouter")
 
 const app = express();
 app.use(cors());
@@ -13,10 +21,15 @@ const servers = [
     { host: 'http://localhost', port: 3005 },
 ];
 
-let current = 0;
 
+
+app.use(bodyParser.json())
+app.use(cors()); // Enable CORS for all routes
+
+let current = 0;
 app.get('/dog', async (req, res) => {
-    const count = parseInt(req.query.count, 10) || 1;
+    const count = parseInt(req.query.count, 10) || 1; // Default to 1 if not specified
+    console.log(count);
     const imagePromises = [];
 
     try {
